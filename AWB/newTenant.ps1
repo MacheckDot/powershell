@@ -22,8 +22,6 @@
 
 .EXAMPLE
     .\\newTenant.ps1 -yourName "Maciej" -yourSurname "Pawiński" -yourUPN "maciej.pawinski" -domain "HM0123.onmicrosoft.com" -defaultPassword "Password123"
-    
-    Runs the script with the specified input and output files.
 #>
 
 param(
