@@ -1,6 +1,7 @@
 <#
 .SYNOPSIS
     A script that collects all information about Entra ID groups and membership. 
+    Autor: Maciej Pawiński
 
 .DESCRIPTION
     The scripts collect all groups with members and properties, then the result is exported to JSON file.  
