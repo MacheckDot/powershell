@@ -9,7 +9,15 @@ param(
 )
 
 #region check modules
-#Export to XLSX + ExchangeManagemntModule
+if (-not(Get-InstalledModule -Name ExchangeManagemntModule)) {
+    Set-ExecutionPolicy RemoteSigned -Scope Process
+    Install-Module -Name ExchangeManagemntModule -Force -Scope CurrentUser
+}
+#This module enables export to xlsx files
+if (-not(Get-InstalledModule -Name ImportExcel)){
+    Set-ExecutionPolicy RemoteSigned -Scope Process
+    Install-Module -Name ImportExcel -RequiredVersion 7.8.10 -Force -Scope CurrentUser
+}
 #endregion
 #region connect to EXO SP or manual
 if (not(Get-ConnectionInformation)){
