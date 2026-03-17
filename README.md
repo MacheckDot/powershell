@@ -1,2 +1,2 @@
 # powershell
-Powershell scripts
+Powershell scripts for managing Exchange Online, EntraID resources and more...

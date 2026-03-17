@@ -9,18 +9,23 @@ param(
 )
 
 #region check modules
-if (-not(Get-InstalledModule -Name ExchangeManagemntModule)) {
+Write-Host "Looking for modules..."
+if (-not(Get-Module -ListAvailable | Where-Object { $_.Name -eq 'ExchangeOnlineManagement' })) {
+    Write-Host "Installing Module ExchangeManagemntModule"
     Set-ExecutionPolicy RemoteSigned -Scope Process
-    Install-Module -Name ExchangeManagemntModule -Force -Scope CurrentUser
+    Install-Module -Name ExchangeManagemntModule -Force -Scope CurrentUser -Verbose:$false
 }
 #This module enables export to xlsx files
-if (-not(Get-InstalledModule -Name ImportExcel)){
+if (-not(Get-Module -ListAvailable | Where-Object { $_.Name -eq 'ImportExcel' })){
+    Write-Host "Installing Module ImportExcel"
     Set-ExecutionPolicy RemoteSigned -Scope Process
-    Install-Module -Name ImportExcel -RequiredVersion 7.8.10 -Force -Scope CurrentUser
+    Install-Module -Name ImportExcel -RequiredVersion 7.8.10 -Force -Scope CurrentUser -Verbose:$false
 }
 #endregion
+Import-Module ExchangeOnlineManagement
+Import-Module ImportExcel
 #region connect to EXO SP or manual
-if (not(Get-ConnectionInformation)){
+if (-not(Get-ConnectionInformation)){
     switch ($ConnectionType) {
         1 {Connect-ExchangeOnline -ShowBanner:$false }
         2 {Connect-ExchangeOnline -AppId $AppId -CertificateThumbprint $CertificateThumbprint -Organization $Organization }
