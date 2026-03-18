@@ -74,7 +74,7 @@ param(
     [string]$SenderAddress,
 
     [Parameter(ParameterSetName="Path")]
-    [System.IO.DirectoryInfo]$ExportPath = '.\',
+    [string]$ExportPath = '.\',
 
     [Parameter()]
     [string]$FileName = 'message_tracing_report_',
@@ -97,6 +97,35 @@ param(
     [ValidatePattern('^(((?!25?[6-9])[12]\d|[1-9])?\d\.?\b){4}$')]
     [string]$RecipientIP
 )
+
+
+function Export-Output {
+    param(
+        [PSCustomObject]
+        $output
+    )
+    [string]$currentDate = Get-Date -Format dd_MM_yyyy
+    $OutputDirectory = if ($ExportPath ) { [string]::Concat($ExportPath , '\') } else { ".\" }
+    $baseFileName = $FileName
+    $extension = ".csv"
+    $counter = 0
+
+    do {
+        $fileName = if ($counter -eq 0) {  [string]::Concat($baseFileName,"_",$currentDate,$extension) } else { [string]::Concat($baseFileName,"_",$currentDate,"_$counter",$extension) }
+        $filePath = [System.IO.Path]::Combine($OutputDirectory, $fileName)
+        $counter++
+    } 
+    while (Test-Path $filePath)
+
+    try {
+        $output | Export-Csv -Path $filePath -Encoding unicode -NoTypeInformation
+        Write-Output "Report saved to $filePath"
+    } 
+    catch {
+        Write-Error "Failed to save the report: $_"
+    }
+}
+
 #Test connection to exchange
 function Test-ExchangeConnection {
     $session = Get-ConnectionInformation
@@ -115,7 +144,7 @@ function Test-ExchangeConnection {
             Write-Error "Failed to connect to Exchange Online: $_"
             return 0
         }
-    }
+    } 
     else {
         return 1
     }
@@ -124,7 +153,6 @@ function Test-ExchangeConnection {
 if(-not(Test-ExchangeConnection)){
     break
 }
-
 
 #Check for end or start date with a period scope, if nothing, use todays date
 if ($StartDate -and -not($EndDate)) {
@@ -218,9 +246,7 @@ if ($AllMessages.Count -eq 0) {
     return
 }
 
-$date = Get-Date -Format 'dd_MM_yyyy'
-$FileName = [string]::Join('',$FileName,$date,'.csv')
-$FinalPath = Join-Path -Path $ExportPath -ChildPath $FileName
 $SortedAllMessages = $AllMessages | Sort-Object  Received
-$SortedAllMessages | Export-Csv -Path $FinalPath -Encoding unicode -NoTypeInformation
-Write-Host "Report exported to $FinalPath"
+
+Export-Output -output $SortedAllMessages
+Write-Host "Report exported to $filePath"
