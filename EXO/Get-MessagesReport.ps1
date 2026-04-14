@@ -247,6 +247,5 @@ if ($AllMessages.Count -eq 0) {
 }
 
 $SortedAllMessages = $AllMessages | Sort-Object  Received
-
 Export-Output -output $SortedAllMessages
 Write-Host "Report exported to $filePath"
